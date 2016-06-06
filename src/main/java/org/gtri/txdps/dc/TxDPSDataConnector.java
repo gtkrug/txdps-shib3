@@ -73,6 +73,7 @@ public class TxDPSDataConnector extends AbstractDataConnector {
     @NonnullAfterInit private String uidAttributeId;
     @NonnullAfterInit private String serviceAccountCredential;
     @NonnullAfterInit private String serviceAccountUser;
+    @NonnullAfterInit private String attrName;
 
     /**
      * Constructor.
@@ -85,6 +86,24 @@ public class TxDPSDataConnector extends AbstractDataConnector {
        // uidAttributeId           = uidAttrName;
     }
 
+    /**
+      * Set the attr
+      * 
+      * @param attr what to set.
+      */
+    public void setAttrName(@Nullable String attr) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        attrName = StringSupport.trimOrNull(attr);
+    }
+    
+    /**
+      * Get the attr
+      * 
+      * @return the attr.
+      */
+    @NonnullAfterInit public String getAttrName() {
+        return attrName;
+    }
     /**
       * Set the url
       * 
@@ -202,7 +221,7 @@ public class TxDPSDataConnector extends AbstractDataConnector {
         } 
 
         String urlQuery = queryURL + strPrincipal;
-        log.debug ("Using Service Acount (" + serviceAccountUser  + ")& Credential (" + serviceAccountCredential + ") Invoking query for: " + urlQuery);
+        log.debug ("Populating Attribute (" + attrName + ") Using Service Account (" + serviceAccountUser  + ")& Credential (" + serviceAccountCredential + ") Invoking query for: " + urlQuery);
 
         Map<String, IdPAttribute> outputAttr = new HashMap<String, IdPAttribute>(1); 
 
@@ -256,6 +275,9 @@ public class TxDPSDataConnector extends AbstractDataConnector {
     protected void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
 
+        if (null == attrName) {
+            throw new ComponentInitializationException(getLogPrefix() + " No attribute name set up.");
+        }
         if (null == queryURL) {
             throw new ComponentInitializationException(getLogPrefix() + " No query url set up.");
         }

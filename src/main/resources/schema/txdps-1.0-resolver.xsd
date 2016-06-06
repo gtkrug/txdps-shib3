@@ -79,6 +79,13 @@
                         </documentation>
                     </annotation>
                 </attribute>
+                <attribute name="attrName" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          The name of the attribute that will be returned by the dataconnector.  The values will be set to the data returned by the service.
+                        </documentation>
+                    </annotation>
+                </attribute>
             </extension>
         </complexContent>
     </complexType>
