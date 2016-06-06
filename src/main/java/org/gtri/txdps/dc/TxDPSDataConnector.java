@@ -7,7 +7,7 @@
  * limitations under the License.
  */
 
-package net.gfipm.shibboleth.dataconnector;
+package org.gtri.txdps.dc;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -46,74 +46,120 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import java.io.StringReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
+
 
 /**
  * Data connector implementation that returns staticly defined attributes.
  */
-public class GfipmTestDataConnector extends AbstractDataConnector {
+public class TxDPSDataConnector extends AbstractDataConnector {
 
     /** Log4j logger. */
-    @NonnullAfterInit private final Logger log =  LoggerFactory.getLogger(GfipmTestDataConnector.class);
+    @NonnullAfterInit private final Logger log =  LoggerFactory.getLogger(TxDPSDataConnector.class);
 
     /** Source Data. */
 //    private Map<String, BaseAttribute> attributes;
 
-    /** Path to User Attribute Files */
-    @NonnullAfterInit private String pathToUserAttributeFiles;
-
-    /** Shibboleth Attribute Definition Id to get the User Id from as opposed to just using the principal id */
+    @NonnullAfterInit private String queryURL;
     @NonnullAfterInit private String uidAttributeId;
+    @NonnullAfterInit private String serviceAccountCredential;
+    @NonnullAfterInit private String serviceAccountUser;
 
     /**
      * Constructor.
      * 
      * @param fileAttributes attributes that configure this data connector
      */
-    public GfipmTestDataConnector() { 
+    public TxDPSDataConnector() { 
        // String pathUserMetadata, String uidAttrName) {
        // pathToUserAttributeFiles = pathUserMetadata;
        // uidAttributeId           = uidAttrName;
     }
 
     /**
-      * Set the attribute to use as the key when identifying an attribute file. 
+      * Set the url
       * 
-      * @param pathToAttributeFiles what to set.
+      * @param url what to set.
       */
-    public void setUidAttribute(@Nullable String uidAttribute) {
+    public void setQueryUrl(@Nullable String url) {
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        uidAttributeId = StringSupport.trimOrNull(uidAttribute);
+        queryURL = StringSupport.trimOrNull(url);
     }
     
     /**
-      * Get the uid attribute.
+      * Get the url
       * 
-      * @return the uid attribute name. 
+      * @return the url.
+      */
+    @NonnullAfterInit public String getQueryUrl() {
+        return queryURL;
+    }
+
+    /**
+      * Set the uid
+      * 
+      * @param uid what to set.
+      */
+    public void setUidAttribute(@Nullable String uid) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        uidAttributeId = StringSupport.trimOrNull(uid);
+    }
+    
+    /**
+      * Get the uid
+      * 
+      * @return the uid.
       */
     @NonnullAfterInit public String getUidAttribute() {
         return uidAttributeId;
     }
-
-
     /**
-      * Set the path of the direcotry that contains an attribute file. 
+      * Set the credential
       * 
-      * @param pathToAttributeFiles what to set.
+      * @param credential what to set.
       */
-    public void setPathToAttributeFiles(@Nullable String pathToAttributeFiles) {
+    public void setServiceAccountCredential(@Nullable String cred) {
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-        pathToUserAttributeFiles = StringSupport.trimOrNull(pathToAttributeFiles);
+        serviceAccountCredential = StringSupport.trimOrNull(cred);
     }
     
     /**
-      * Get the path of the directory that contains an attribute file. 
+      * Get the credential
       * 
-      * @return the Path to the Attributes File. 
+      * @return the credential.
       */
-    @NonnullAfterInit public String getPathToAttributeFiles() {
-        return pathToUserAttributeFiles;
+    @NonnullAfterInit public String getServiceAccountCredential() {
+        return serviceAccountCredential;
     }
  
+    /**
+      * Set the user.
+      * 
+      * @param user
+      */
+    public void setServiceAccountUser(@Nullable String user) {
+        ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+        serviceAccountUser = StringSupport.trimOrNull(user);
+    }
+    
+    /**
+      * Get the user.
+      * 
+      * @return the user.
+      */
+    @NonnullAfterInit public String getServiceAccountUser() {
+        return serviceAccountUser;
+    }
+
     private String getPrincipal (
             @Nonnull final AttributeResolutionContext resolutionContext,
             @Nonnull final AttributeResolverWorkContext workContext) {
@@ -153,69 +199,74 @@ public class GfipmTestDataConnector extends AbstractDataConnector {
         {
            log.error ("Failed to identify the principal");
            throw new ResolutionException("Unique principal not identified.");
-        } else if ( strPrincipal.startsWith ("/") )
-        {
-           int start = strPrincipal.indexOf ('=');
-           int end   = strPrincipal.indexOf ('/', start);
-           strPrincipal = strPrincipal.substring (start + 1, end); // ;/CN=LinuxrefUser1/ST=GA/C=US/O=Georgia Tech.xml
-        }
-       
-        // Now as a safety precaution in case the above fails to make a username safe
-        strPrincipal.replace ('/', '-');
-        strPrincipal.replace ('\\', '-');
-        strPrincipal.replace ('=', '_');
+        } 
 
-        String strFileName = pathToUserAttributeFiles + strPrincipal + ".attr";
+        String urlQuery = queryURL + strPrincipal;
+        log.debug ("Using Service Acount (" + serviceAccountUser  + ")& Credential (" + serviceAccountCredential + ") Invoking query for: " + urlQuery);
 
-        log.debug ("Trying to load attribute file: " + strFileName + "\n");
+        Map<String, IdPAttribute> outputAttr = new HashMap<String, IdPAttribute>(1); 
 
-        Map<String, IdPAttribute> outputAttr = new HashMap<String, IdPAttribute>(20);
+	{
+           // Debug Example - Insert Real Code Here and set the return value from the server as strResults before calling ParseXml;
+           String strResults = "<ROLES><NQUIRY /></ROLES>";
 
-	try {
-	   File inputFile = new File(strFileName);
-	   BufferedReader in = new BufferedReader(new FileReader(inputFile));
-	   String strNextLine = "";
-
-           while ( (strNextLine = in.readLine()) != null ) {
-             String[] tokens = strNextLine.split(" :: ");
-           
-             if (tokens.length != 2) {
-               log.debug ("Delimiter error when parsing attribute line: " + strNextLine);
-             }
-             else {
-               String strAttrName  = tokens[0];
-               String strAttrValue = tokens[1];
-               log.debug ("Attr  = " + strAttrName + "\nValue = " + strAttrValue + "\n");
-
-               List<IdPAttributeValue<String>> outputValue = Lists.newArrayListWithExpectedSize(1);
-               outputValue.add(new StringAttributeValue(strAttrValue));
-
-               final IdPAttribute tempAttr = new IdPAttribute(strAttrName);
-               tempAttr.setValues(outputValue);
-               
-               outputAttr.put (tempAttr.getId(), tempAttr);
-             }
-	   }
-	}
-	catch (java.io.FileNotFoundException name) {
-	   throw new ResolutionException("File Not Found: " + strFileName);
-	} catch (java.io.IOException e) {
-           throw new ResolutionException("File Parsing Error, while reading " + strFileName);
-	}
+           // TBD
+        }            
 
         return outputAttr;
     }
+
+    private IdPAttributeValue<String> ParseXmlResponse (String xmlResults) {
+
+       StringAttributeValue attrVal = null;
+
+       log.debug("Parsing XML Response: " + xmlResults);
+
+       try {
+          StringReader           xmlReader = new StringReader(xmlResults);
+          DocumentBuilderFactory dbf       = DocumentBuilderFactory.newInstance();
+          DocumentBuilder        db        = dbf.newDocumentBuilder();
+          Document               doc       = db.parse(new InputSource(xmlReader));
+
+
+          Element root = doc.getDocumentElement();
+          NodeList nl  = root.getChildNodes ();
+          if (nl != null && nl.getLength() > 0) {
+            log.debug("Found ROLE Root Element: " + nl);
+             for (int i = 0; i < nl.getLength(); i++) {
+                Element el = (Element)nl.item(i);
+                attrVal = new StringAttributeValue(el.getNodeName());
+             }
+          }
+          else
+          {
+            log.debug("Node List Empty for: " + root);
+          }
+
+       } catch (Exception e) {
+          log.error("Attribute Resolution Failure Parsing DPS Query Response: " + xmlResults);
+       }
+
+       return attrVal;
+    }
+
 
     /** {@inheritDoc} */
     @Override
     protected void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
 
-        if (null == uidAttributeId) {
-            throw new ComponentInitializationException(getLogPrefix() + " No uid attribute source set up.");
+        if (null == queryURL) {
+            throw new ComponentInitializationException(getLogPrefix() + " No query url set up.");
         }
-        if (null == pathToUserAttributeFiles) {
-            throw new ComponentInitializationException(getLogPrefix() + " No path to attribute files set up.");
+        if (null == uidAttributeId) {
+            throw new ComponentInitializationException(getLogPrefix() + " No uid attribute set up.");
+        }
+        if (null == serviceAccountCredential) {
+            throw new ComponentInitializationException(getLogPrefix() + " No service account credential set up.");
+        }
+        if (null == serviceAccountUser) {
+            throw new ComponentInitializationException(getLogPrefix() + " No service account user set up.");
         }
     }
 
