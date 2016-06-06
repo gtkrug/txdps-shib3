@@ -58,7 +58,7 @@
                         </documentation>
                     </annotation>
                 </attribute>
-                <attribute name="queryURL" type="string" use="required">
+                <attribute name="queryUrl" type="string" use="required">
                     <annotation>
                         <documentation>
                           This is the url to query.

@@ -66,7 +66,7 @@ public class TxDPSDataConnectorParser extends AbstractDataConnectorParser {
 
         final String user = AttributeSupport.getAttributeValue(config, new QName("serviceAccountUser"));
         final String cred = AttributeSupport.getAttributeValue(config, new QName("serviceAccountCredential"));
-        final String url  = AttributeSupport.getAttributeValue(config, new QName("queryURL"));
+        final String url  = AttributeSupport.getAttributeValue(config, new QName("queryUrl"));
         final String uid  = AttributeSupport.getAttributeValue(config, new QName("uidAttribute"));
         final String attr = AttributeSupport.getAttributeValue(config, new QName("attrName"));
 
@@ -74,7 +74,7 @@ public class TxDPSDataConnectorParser extends AbstractDataConnectorParser {
 
         builder.addPropertyValue("serviceAccountUser", user);
         builder.addPropertyValue("serviceAccountCredential", cred);
-        builder.addPropertyValue("queryURL", url);
+        builder.addPropertyValue("queryUrl", url);
         builder.addPropertyValue("uidAttribute", uid);
         builder.addPropertyValue("attrName", attr);
     }
