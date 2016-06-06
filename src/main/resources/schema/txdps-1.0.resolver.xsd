@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<schema targetNamespace="urn:global:gfipm:1.2:resolver" xmlns="http://www.w3.org/2001/XMLSchema"
-    xmlns:gfipm="urn:global:gfipm:1.2:resolver" 
+<schema targetNamespace="urn:global:txdps:1.0:resolver" xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:txdps="urn:global:txdps:1.0:resolver" 
     xmlns:dc="urn:mace:shibboleth:2.0:resolver:dc" 
     xmlns:resolver="urn:mace:shibboleth:2.0:resolver" 
     xmlns:sec="urn:mace:shibboleth:2.0:security" 
@@ -42,5 +42,45 @@
         </complexContent>
     </complexType>
 
+    <complexType name="TxDPSQuery">
+        <annotation>
+            <documentation>
+                A data connector that gets its information by performing a simple web service query.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="resolver:BaseDataConnectorType">
+                <attribute name="uidAttribute" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the Shibboleth Attribute Definition Id which represents the user id to query for within the Criminal
+                          History roles DB.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="queryURL" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the url to query.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="serviceAccountCredential" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the url to query.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="serviceAccountUser" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the url to query.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
 
 </schema>

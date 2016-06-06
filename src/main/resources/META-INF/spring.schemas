@@ -1,1 +1,1 @@
-urn\:global\:gfipm\:1.2\:resolver = schema/gfipm-1.2-resolver.xsd
+urn\:global\:txdps\:1.0\:resolver = schema/txdps-1.0.resolver.xsd

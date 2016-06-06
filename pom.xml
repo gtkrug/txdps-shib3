@@ -2,12 +2,12 @@
 
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>GTRI.IEAD.GFIPM</groupId>
-    <artifactId>gfipm-test-dc</artifactId>
+    <groupId>GTRI.IEAD</groupId>
+    <artifactId>txdps-dc</artifactId>
     <version>0.7.2</version>
     <packaging>jar</packaging>
 
-    <name>gfipm-dc</name>
+    <name>txdps-dc</name>
  
     <repositories>
         <repository>
