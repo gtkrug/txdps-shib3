@@ -1,5 +1,4 @@
-
-package net.gfipm.shibboleth.config;
+package org.gtri.txdps.config;
 
 import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
 
@@ -7,15 +6,16 @@ import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
 /**
  * Spring namespace handler for the GFIPM BAE data connector namespace.
  */
-public class GFIPMNamespaceHandler extends BaseSpringNamespaceHandler {
+public class TXDPSNamespaceHandler extends BaseSpringNamespaceHandler {
 
     /** Namespace for this handler. */
-    public static final String NAMESPACE = "urn:global:gfipm:1.2:resolver";
+    public static final String NAMESPACE = "urn:global:txdps:1.0:resolver";
     
     /** {@inheritDoc} */
     public void init() {
         // Register GFIPM Data Connector Parsers.
-        registerBeanDefinitionParser(GfipmTestDataConnectorParser.TYPE_NAME, new GfipmTestDataConnectorParser());
+        registerBeanDefinitionParser(TestDataConnectorParser.TYPE_NAME,  new TestDataConnectorParser());
+        registerBeanDefinitionParser(TxDPSDataConnectorParser.TYPE_NAME, new TxDPSDataConnectorParser());
     }
 
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package net.gfipm.shibboleth.config;
+package org.gtri.txdps.config;
 
-import net.gfipm.shibboleth.dataconnector.GfipmTestDataConnector;
+import org.gtri.txdps.dc.TxDPSDataConnector;
 
 import java.util.List;
 
@@ -41,20 +41,20 @@ import org.w3c.dom.Element;
 /**
  * Spring Bean Definition Parser for GFIPM Test data connector.
  */
-public class GfipmTestDataConnectorParser extends AbstractDataConnectorParser {
+public class TxDPSDataConnectorParser extends AbstractDataConnectorParser {
 
     /** Schema type name. */
-    public static final QName TYPE_NAME = new QName(GFIPMNamespaceHandler.NAMESPACE, "Test");
+    public static final QName TYPE_NAME = new QName(TXDPSNamespaceHandler.NAMESPACE, "TxDPSQuery");
 
     /** Local name of attribute. */
-    public static final QName ATTRIBUTE_ELEMENT_NAME = new QName(GFIPMNamespaceHandler.NAMESPACE, "Attribute");
+    public static final QName ATTRIBUTE_ELEMENT_NAME = new QName(TXDPSNamespaceHandler.NAMESPACE, "Attribute");
 
     /** Class logger. */
-    private final Logger log = LoggerFactory.getLogger(GfipmTestDataConnectorParser.class);
+    private final Logger log = LoggerFactory.getLogger(TxDPSDataConnectorParser.class);
 
     /** {@inheritDoc} */
-    @Override protected Class<GfipmTestDataConnector> getNativeBeanClass() {
-        return GfipmTestDataConnector.class;
+    @Override protected Class<TxDPSDataConnector> getNativeBeanClass() {
+        return TxDPSDataConnector.class;
     }
 
 
@@ -64,13 +64,17 @@ public class GfipmTestDataConnectorParser extends AbstractDataConnectorParser {
         //super.doParse(config, parserContext, builder);
         log.debug("doV2Parse {}", config);
 
-        final String userPath = AttributeSupport.getAttributeValue(config, new QName("pathToAttributeFiles"));
-        final String uidAttr  = AttributeSupport.getAttributeValue(config, new QName("uidAttribute"));
+        final String user = AttributeSupport.getAttributeValue(config, new QName("serviceAccountUser"));
+        final String cred = AttributeSupport.getAttributeValue(config, new QName("serviceAccountCredential"));
+        final String url  = AttributeSupport.getAttributeValue(config, new QName("queryURL"));
+        final String uid  = AttributeSupport.getAttributeValue(config, new QName("uidAttribute"));
 
-        log.debug("Parsing configuration Path {}, Attribute {}", userPath, uidAttr);
+        log.debug("Parsing configuration User {}, Cred {}, URL {}, uidAttr {}", user, cred, url, uid);
 
-        builder.addPropertyValue("pathToAttributeFiles", userPath);
-        builder.addPropertyValue("uidAttribute", uidAttr);
+        builder.addPropertyValue("serviceAccountUser", user);
+        builder.addPropertyValue("serviceAccountCredential", cred);
+        builder.addPropertyValue("queryURL", url);
+        builder.addPropertyValue("uidAttribute", uid);
     }
 
 }
