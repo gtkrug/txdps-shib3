@@ -57,6 +57,19 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.HttpURLConnection;
+import java.util.Date;
+import java.io.InputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+
 
 /**
  * Data connector implementation that returns staticly defined attributes.
@@ -225,15 +238,43 @@ public class TxDPSDataConnector extends AbstractDataConnector {
 
         Map<String, IdPAttribute> outputAttr = new HashMap<String, IdPAttribute>(1); 
 
-	{
-           // Debug Example - Insert Real Code Here and set the return value from the server as strResults before calling ParseXml;
-           String strResults = "<ROLES><NQUIRY/><TEST2/></ROLES>";
 
-           final IdPAttribute tmpAttr = new IdPAttribute (attrName);
-           tmpAttr.setValues (ParseXmlResponse(strResults));
+        try {
+          URL geturl = new URL(urlQuery);
+          HttpURLConnection  connection = (HttpURLConnection) geturl.openConnection();
+          String sig = sign (geturl, "GET", connection, serviceAccountCredential);
+          connection.addRequestProperty("Authorization", "CJIS256 " + serviceAccountUser + ":" + sig);
+          log.debug ("  Custom Signature = " + sig);
+          connection.connect();
+          InputStream is = connection.getInputStream();
+          byte[] buf = new byte[1024];
+          int num;
+          log.debug ("  Custom Web Service Response Code = " + connection.getResponseCode());
+          String strResults = null;
+          while ( (num = is.read(buf)) > 0) {
+            byte[] bytes = new byte[num];
+            System.arraycopy(buf, 0, bytes, 0, num);
+            strResults = new String(bytes);
+            log.debug ("  Custom Web Service Response = " + strResults);
+          }
+          // Debug Example - Insert Real Code Here and set the return value from the server as strResults before calling ParseXml;
+          // String strResults = "<ROLES><NQUIRY/><TEST2/></ROLES>";
 
-           outputAttr.put (tmpAttr.getId(), tmpAttr);
-        }            
+          if ( strResults != null ) {
+            final IdPAttribute tmpAttr = new IdPAttribute (attrName);
+            tmpAttr.setValues (ParseXmlResponse(strResults));
+            outputAttr.put (tmpAttr.getId(), tmpAttr);
+          }
+        } catch (MalformedURLException me) {
+           log.error ("Bad URL: " + urlQuery);
+           throw new ResolutionException("Web Service unable to be queried.");
+        } catch (IOException ie) {
+           log.error ("I/O Error while reading from URL: " + urlQuery);
+           throw new ResolutionException("Web Service unable to be queried successfully.");
+        } catch (Exception e) {
+           log.error ("Unknown exception while querying webservice: " + e);
+           throw new ResolutionException("Unknown error when attempting to query web service.");
+        } 
 
         return outputAttr;
     }
@@ -254,11 +295,12 @@ public class TxDPSDataConnector extends AbstractDataConnector {
           Element root = doc.getDocumentElement();
           NodeList nl  = root.getChildNodes ();
           if (nl != null && nl.getLength() > 0) {
-             log.debug("Found ROLE Root Element: " + nl);
+             log.debug("Found  Root Element (" + nl + ") with child count: " + nl.getLength());
              attrVals = Lists.newArrayListWithExpectedSize(nl.getLength());
              for (int i = 0; i < nl.getLength(); i++) {
                 Element el = (Element)nl.item(i);
                 attrVals.add(new StringAttributeValue(el.getNodeName()));
+                log.debug("   - Adding attribute value: " + el.getNodeName());
              }
           }
           else
@@ -271,6 +313,52 @@ public class TxDPSDataConnector extends AbstractDataConnector {
        }
 
        return attrVals;
+    }
+
+    private static String now() {
+            Date date = new Date();
+            String pattern = "EEE, dd MMM yyyy HH:mm:ss zzz";
+            TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+            SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.US);
+            formatter.setTimeZone(GMT);
+            return formatter.format(date);
+      }
+
+
+    private static String sign(URL url, String verb, URLConnection connection, String secret) throws Exception {
+            String date = connection.getRequestProperty("Date");
+            if (date == null) {
+                  date = now();
+                  connection.addRequestProperty("Date", date);
+            }
+            String md5 = connection.getRequestProperty("CONTENT-MD5");
+            if (md5 == null) {
+                  md5 = "";
+            }
+            String contentType = connection.getRequestProperty("ContentType");
+            if (contentType == null) {
+                  contentType = "";
+            }
+            String resource = url.getPath();
+            if (url.getQuery() != null) {
+                  resource += "?" + url.getQuery();
+            }
+            String stringToSign = String.format("%s%s\n%s\n%s\n%s\n%s", secret,
+                        verb, md5, contentType, date, resource);
+            //System.out.println(stringToSign);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(stringToSign.getBytes());
+
+            char[] hexadecimals = new char[hash.length * 2];
+            for (int i = 0; i < hash.length; ++i) {
+                  for (int j = 0; j < 2; ++j) {
+                        int value = (hash[i] >> (4 - 4 * j)) & 0xf;
+                        char base = (value < 10) ? ('0') : ('a' - 10);
+                        hexadecimals[i * 2 + j] = (char) (base + value);
+               }
+        }
+        return new String(hexadecimals);
     }
 
 
