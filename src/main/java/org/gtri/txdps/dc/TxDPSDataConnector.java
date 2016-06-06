@@ -227,17 +227,20 @@ public class TxDPSDataConnector extends AbstractDataConnector {
 
 	{
            // Debug Example - Insert Real Code Here and set the return value from the server as strResults before calling ParseXml;
-           String strResults = "<ROLES><NQUIRY /></ROLES>";
+           String strResults = "<ROLES><NQUIRY/><TEST2/></ROLES>";
 
-           // TBD
+           final IdPAttribute tmpAttr = new IdPAttribute (attrName);
+           tmpAttr.setValues (ParseXmlResponse(strResults));
+
+           outputAttr.put (tmpAttr.getId(), tmpAttr);
         }            
 
         return outputAttr;
     }
 
-    private IdPAttributeValue<String> ParseXmlResponse (String xmlResults) {
+    private List<IdPAttributeValue<String>> ParseXmlResponse (String xmlResults) {
 
-       StringAttributeValue attrVal = null;
+       List<IdPAttributeValue<String>> attrVals = null;
 
        log.debug("Parsing XML Response: " + xmlResults);
 
@@ -251,10 +254,11 @@ public class TxDPSDataConnector extends AbstractDataConnector {
           Element root = doc.getDocumentElement();
           NodeList nl  = root.getChildNodes ();
           if (nl != null && nl.getLength() > 0) {
-            log.debug("Found ROLE Root Element: " + nl);
+             log.debug("Found ROLE Root Element: " + nl);
+             attrVals = Lists.newArrayListWithExpectedSize(nl.getLength());
              for (int i = 0; i < nl.getLength(); i++) {
                 Element el = (Element)nl.item(i);
-                attrVal = new StringAttributeValue(el.getNodeName());
+                attrVals.add(new StringAttributeValue(el.getNodeName()));
              }
           }
           else
@@ -266,7 +270,7 @@ public class TxDPSDataConnector extends AbstractDataConnector {
           log.error("Attribute Resolution Failure Parsing DPS Query Response: " + xmlResults);
        }
 
-       return attrVal;
+       return attrVals;
     }
 
 
