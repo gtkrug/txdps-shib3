@@ -267,13 +267,13 @@ public class TxDPSDataConnector extends AbstractDataConnector {
           }
         } catch (MalformedURLException me) {
            log.error ("Bad URL: " + urlQuery);
-           throw new ResolutionException("Web Service unable to be queried.");
+//           throw new ResolutionException("Web Service unable to be queried.");
         } catch (IOException ie) {
            log.error ("I/O Error while reading from URL: " + urlQuery);
-           throw new ResolutionException("Web Service unable to be queried successfully.");
+//           throw new ResolutionException("Web Service unable to be queried successfully.");
         } catch (Exception e) {
            log.error ("Unknown exception while querying webservice: " + e);
-           throw new ResolutionException("Unknown error when attempting to query web service.");
+//           throw new ResolutionException("Unknown error when attempting to query web service.");
         } 
 
         return outputAttr;
