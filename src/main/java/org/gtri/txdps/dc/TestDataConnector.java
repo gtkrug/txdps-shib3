@@ -145,6 +145,7 @@ public class TestDataConnector extends AbstractDataConnector {
 
         Constraint.isNotNull(resolutionContext, "AttributeResolutionContext cannot be null");
         Constraint.isNotNull(workContext, "AttributeResolverWorkContext cannot be null");
+        log.trace ("Resolving Test Dataconnector");
 
         String strPrincipal = getPrincipal (resolutionContext, workContext);
 
