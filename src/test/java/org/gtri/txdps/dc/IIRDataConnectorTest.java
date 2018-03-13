@@ -38,9 +38,10 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import org.opensaml.security.httpclient.impl.SecurityEnhancedHttpClientSupport;
-
+import org.json.JSONObject;
 
 /** Tests for {@link TestDataConnector}
  *  *
@@ -51,7 +52,7 @@ public class IIRDataConnectorTest {
    String json = "{ 'email': 'user@domain.com' }"; 
 
 
-   @Test public void testInit() {
+   @Test public void testCode() {
 
        // Basic Testing
        CloseableHttpClient myclient = HttpClientBuilder.create().setSSLSocketFactory(SecurityEnhancedHttpClientSupport.buildTLSSocketFactory(false, false)).build();
@@ -68,6 +69,18 @@ public class IIRDataConnectorTest {
        try {
          CloseableHttpResponse myResp = myclient.execute(myPost);
          Assert.assertEquals(myResp.getStatusLine().getStatusCode(), 200);
+
+         String resp = EntityUtils.toString (myResp.getEntity());
+
+         JSONObject result = new JSONObject (resp);
+
+         Assert.assertNotNull (myclient); 
+           
+         Boolean Certification = result.getBoolean ("completed");
+
+         Assert.assertTrue (Certification);
+
+         myResp.close();
        } catch (ClientProtocolException e) {
          Assert.fail ("Protocol Exception when comunicating with server: ", e);
        } catch (IOException e) {
