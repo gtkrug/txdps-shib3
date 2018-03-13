@@ -98,7 +98,7 @@
         </annotation>
         <complexContent>
             <extension base="resolver:BaseDataConnectorType">
-                <attribute name="uidAttribute" type="string" use="required">
+                <attribute name="emailAttribute" type="string" use="required">
                     <annotation>
                         <documentation>
                           This is the Shibboleth Attribute Definition Id which represents the user id to query for within the IIR

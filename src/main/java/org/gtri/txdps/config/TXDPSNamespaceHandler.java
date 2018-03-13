@@ -9,13 +9,14 @@ import net.shibboleth.ext.spring.util.BaseSpringNamespaceHandler;
 public class TXDPSNamespaceHandler extends BaseSpringNamespaceHandler {
 
     /** Namespace for this handler. */
-    public static final String NAMESPACE = "urn:global:txdps:1.0:resolver";
+    public static final String NAMESPACE = "urn:global:txdps:1.1:resolver";
     
     /** {@inheritDoc} */
     public void init() {
         // Register GFIPM Data Connector Parsers.
         registerBeanDefinitionParser(TestDataConnectorParser.TYPE_NAME,  new TestDataConnectorParser());
         registerBeanDefinitionParser(TxDPSDataConnectorParser.TYPE_NAME, new TxDPSDataConnectorParser());
+        registerBeanDefinitionParser(IIRDataConnectorParser.TYPE_NAME, new IIRDataConnectorParser());
     }
 
 }
