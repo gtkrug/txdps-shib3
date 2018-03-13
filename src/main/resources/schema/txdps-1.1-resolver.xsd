@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<schema targetNamespace="urn:global:txdps:1.0:resolver" xmlns="http://www.w3.org/2001/XMLSchema"
-    xmlns:txdps="urn:global:txdps:1.0:resolver" 
+<schema targetNamespace="urn:global:txdps:1.1:resolver" xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:txdps="urn:global:txdps:1.1:resolver" 
     xmlns:dc="urn:mace:shibboleth:2.0:resolver:dc" 
     xmlns:resolver="urn:mace:shibboleth:2.0:resolver" 
     xmlns:sec="urn:mace:shibboleth:2.0:security" 
@@ -90,4 +90,39 @@
         </complexContent>
     </complexType>
 
+    <complexType name="IIRQuery">
+        <annotation>
+            <documentation>
+                A data connector that gets 28-CFR information by performing a simple web service query.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="resolver:BaseDataConnectorType">
+                <attribute name="uidAttribute" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the Shibboleth Attribute Definition Id which represents the user id to query for within the IIR
+                          28 CFR Certification web service.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="queryUrl" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          This is the url to query. It should include a single parameter that includes a token provided by IIR.
+                        </documentation>
+                    </annotation>
+                </attribute>
+                <attribute name="attrName" type="string" use="required">
+                    <annotation>
+                        <documentation>
+                          The name of the attribute that will be returned by the dataconnector.  The values will be set to the data returned by the service.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>
+
 </schema>
+
