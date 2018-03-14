@@ -1,9 +1,10 @@
 # txdps-shib3
 IDP3 Dataconnector for Texas DPS
 
-This includes 3 data connectors.  One test connector that reads attribute files found on the filesystem, one that queries an internal TXDPS webservice, and one that querie IIR.
+This includes 3 data connectors.  One test connector that reads attribute files found on the filesystem, one that queries an internal TXDPS webservice, and one that queries IIR's 28CFR Certification Checking Service.
 
 Sample configurations are available here:
+
     <resolver:DataConnector id="GfipmTest" xsi:type="txdps:Test" 
                             xmlns="urn:global:txdps:1.1:resolver"
                             pathToAttributeFiles="/opt/idp/users/"
@@ -19,6 +20,6 @@ Sample configurations are available here:
         <resolver:Dependency ref="Email" />
     </resolver:DataConnector>
 
-The above sample queries the IIR test service that always returns incomplete testing.  For production the queryUrl would be https://tca.iir.com/api/Lookup?code=
+The above IIRQuery sample queries the IIR test service that always returns incomplete testing.  For production the queryUrl would be https://tca.iir.com/api/Lookup?code=
 
 
