@@ -132,7 +132,7 @@ public class IIRDataConnector extends AbstractDataConnector {
       * 
       * @param email what to set.
       */
-    public void setUidAttribute(@Nullable String email) {
+    public void setEmailAttribute(@Nullable String email) {
         ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
         emailAttributeId = StringSupport.trimOrNull(email);
     }

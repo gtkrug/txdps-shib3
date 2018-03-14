@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>GTRI.IEAD</groupId>
     <artifactId>txdps-dc</artifactId>
-    <version>0.7.2</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>txdps-dc</name>
@@ -67,12 +67,12 @@
         <dependency>
            <groupId>org.apache.httpcomponents</groupId>
            <artifactId>httpclient</artifactId>
-           <version>4.5.3</version>
+           <version>4.3.6</version>
         </dependency>
         <dependency>
            <groupId>org.apache.httpcomponents</groupId>
            <artifactId>httpcore</artifactId>
-           <version>4.4.8</version>
+           <version>4.3.3</version>
         </dependency>
         <dependency>
            <groupId>org.json</groupId>
